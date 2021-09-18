@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import {store, connect, Context} from './redux'
 
 function App() {
@@ -13,6 +13,13 @@ function App() {
 
 export default App
 
+
+const mapStateToProps = (state) => {
+  return {
+    user: state.user
+  }
+}
+
 const One = () => {
   console.log('render 1')
   return (<section>
@@ -25,10 +32,13 @@ const Two = () => {
     TWO <ModifyMsg label={'x'} />
   </section>
 }
-const Three = () => <section>THREE</section>;
+const Three = () => {
+  console.log('render 3');
+  return <section>THREE</section>;
+};
 
-const Msg = connect(() => {
-  const { state: user } = useContext(Context);
+const Msg = connect(mapStateToProps)(({user}) => {
+  console.log('render Msg');
   return (
     <>
       {user.name} + {user.msg}
@@ -37,15 +47,16 @@ const Msg = connect(() => {
 });
 
 const _ModifyMsg = ({dispatch, state, label}) => {
+  console.log('render ModifyMsg');
   const onChange = (e) => {
     dispatch({ type: "updateUser", payload: { msg: e.target.value } });
   }
   return (
     <>
       <span>{label}</span>
-      <input onChange={onChange} value={state.msg} placeholder={state.msg} />
+      <input onChange={onChange} value={state.user.msg} placeholder={state.msg} />
     </>
   );
 }
 
-const ModifyMsg = connect(_ModifyMsg)
+const ModifyMsg = connect()(_ModifyMsg)

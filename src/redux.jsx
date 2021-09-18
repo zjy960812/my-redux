@@ -4,8 +4,11 @@ export const Context = createContext(null);
 
 export const store = {
   state: {
-    name: "liming",
-    msg: "iam a doctor",
+    user: {
+      name: "liming",
+      msg: "iam a doctor",
+    },
+    group: 'frontEnd'
   },
   setState(newState) {
     store.state = newState;
@@ -28,24 +31,28 @@ const reducer = (state, { type, payload }) => {
     case "updateUser":
       return {
         ...state,
-        ...payload,
+        user: {
+          ...state.user,
+          ...payload,
+        },
       };
     default:
       return state;
   }
 };
 
-export const connect = (Component) => {
+export const connect = (selector) => (Component) => {
   return (props) => {
-    const { state: user, setState: setUser, subscribe } = useContext(Context);
+    const { state, setState, subscribe } = useContext(Context);
+    const data = selector ? selector(state) : { state };
     const [, update] = useState({});
     useEffect(() => {
       subscribe(() => update({}));
     }, []);
     const dispatch = (action) => {
-      setUser(reducer(user, action));
+      setState(reducer(state, action));
     };
 
-    return <Component {...props} dispatch={dispatch} state={user} />;
+    return <Component {...props} dispatch={dispatch} {...data} />;
   };
 };
