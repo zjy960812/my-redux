@@ -27,7 +27,7 @@ const One = () => (
 );
 const Two = () => (
   <section>
-    TWO <Wrapper />
+    TWO <ModifyMsg label={'x'} />
   </section>
 );
 const Three = () => <section>THREE</section>;
@@ -54,20 +54,27 @@ const Msg = () => {
   );
 }
 
-const ModifyMsg = ({dispatch, state}) => {
+const _ModifyMsg = ({dispatch, state, label}) => {
   const onChange = (e) => {
     dispatch({ type: "updateUser", payload: { msg: e.target.value } });
   }
   return (
-    <input onChange={onChange} value={state.msg} placeholder={state.msg} />
+    <>
+      <span>{label}</span>
+      <input onChange={onChange} value={state.msg} placeholder={state.msg} />
+    </>
   );
 }
 
-const Wrapper = () => {
-  const { user, setUser } = useContext(Context);
-  const dispatch = (action) => {
-    setUser(reducer(user, action))
-  }
+const connect = (Component) => {
+  return (props) => {
+    const { user, setUser } = useContext(Context);
+    const dispatch = (action) => {
+      setUser(reducer(user, action));
+    };
 
-  return <ModifyMsg dispatch={dispatch}  state={user} />
+    return <Component {...props} dispatch={dispatch} state={user} />;
+  };
 }
+
+const ModifyMsg = connect(_ModifyMsg)
